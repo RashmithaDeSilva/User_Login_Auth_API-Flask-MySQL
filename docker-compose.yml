@@ -1,0 +1,41 @@
+version: '3'
+
+services:
+  mysql-db:
+    build:
+      context: ./database
+      dockerfile: Dockerfile
+    container_name: chatbot-db
+    image: chatbot-db-image
+    networks:
+      mynetwork:
+        ipv4_address: 172.18.0.2
+    environment:
+      MYSQL_ROOT_PASSWORD: 1234
+      MYSQL_DATABASE: chatbot
+      MYSQL_PASSWORD: 1234
+    ports:
+      - "3306:3306"
+
+  flask-app:
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+    container_name: chatbot-api
+    image: chatbot-api-image
+    networks:
+      mynetwork:
+        ipv4_address: 172.18.0.3
+    ports:
+      - "5000:5000"
+    depends_on:
+      - mysql-db
+
+networks:
+  mynetwork:
+    name: chatbot-network
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.18.0.0/16
