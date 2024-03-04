@@ -4,7 +4,7 @@ from flask_bcrypt import Bcrypt
 
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'xyz123'
+app.config['SECRET_KEY'] = 'chatbot_secret_key'
 
 app.config['MYSQL_HOST'] = '172.18.0.2'
 app.config['MYSQL_USER'] = 'root'
@@ -36,6 +36,7 @@ def api_redirect():
     return redirect(url_for('index'))
 
 
+# Signup
 @app.route('/api/signup', methods=['POST'])
 def signup():
     if request.method == 'POST':
@@ -51,7 +52,8 @@ def signup():
             "inputs": {
                 "user_name": user_name,
                 "email": email
-            }
+            },
+            "redirect_url": "/api/signup"
         }
 
         if user_name and email and password:
@@ -75,6 +77,7 @@ def signup():
                 # Close the cursor
                 cur.close()
 
+                data["redirect_url"] = "/api/login"
                 data["msg"] = "Successfully signup"
                 data["status"] = True
 
@@ -94,6 +97,7 @@ def signup():
         return jsonify({"status": False, "msg": "Method Not Allowed"}), 405
     
 
+# Login
 @app.route('/api/login', methods=['POST'])
 def login():
     if request.method == 'POST':
@@ -157,6 +161,7 @@ def login():
         return jsonify({"status": False,  "msg": "Method Not Allowed!"}), 405
 
 
+# Logout
 @app.route('/api/logout')
 def logout():
     session.pop('auth_status', None)
@@ -164,6 +169,7 @@ def logout():
     return jsonify({"auth_status": False, "msg": "Logged out successfully"}), 200
 
 
+# Foget Password
 @app.route('/api/fogetpassword', methods=['POST'])
 def foget_password():
     if request.method == 'POST':
@@ -225,6 +231,10 @@ def foget_password():
                 # Close the cursor
                 cur.close()
 
+                # Logout user
+                session.pop('auth_status', None)
+                session.pop('user_id', None)
+
                 return jsonify({"auth": False, "status": True, "msg": "Password change successfully"}), 201
             
             except Exception as e:
@@ -239,6 +249,7 @@ def foget_password():
         return jsonify({"status": False,  "msg": "Method Not Allowed!"}), 405
     
 
+# Serch
 @app.route('/api/serch', methods=['POST'])
 def serch():
     if request.method == 'POST':
