@@ -8,11 +8,6 @@ ENV MYSQL_PASSWORD=1234
 # Set a static IP address
 ENV STATIC_IP 172.18.0.3
 
-# Configure the network with the static IP
-# RUN echo "auto eth0" >> /etc/network/interfaces && \
-#     echo "iface eth0 inet static" >> /etc/network/interfaces && \
-#     echo "    address $STATIC_IP" >> /etc/network/interfaces
-
 # Set the working directory to /app
 WORKDIR /app
 

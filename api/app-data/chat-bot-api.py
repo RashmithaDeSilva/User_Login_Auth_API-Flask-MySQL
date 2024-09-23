@@ -1,20 +1,27 @@
 from flask import Flask, request, redirect, url_for, jsonify, session
 from flask_mysqldb import MySQL
 from flask_bcrypt import Bcrypt
+# from model import client_model
 
 
+# Create flask app
 app = Flask(__name__)
+
+# Set SECRET_KEY to set sessions
 app.config['SECRET_KEY'] = 'chatbot_secret_key'
 
+# Setup MySQL
 app.config['MYSQL_HOST'] = '172.18.0.2'
 app.config['MYSQL_USER'] = 'root'
 app.config['MYSQL_PASSWORD'] = '1234'
 app.config['MYSQL_DB'] = 'chatbot'
 mysql = MySQL(app)
 
+# Load Bcrypt for encrypt and decrypt password
 bcrypt = Bcrypt(app)
 
 
+# Check authorization
 @app.before_request
 def before_request():
     if request.cookies.get('session') is None and request.endpoint not in ['index', 'login', 'signup']:
@@ -250,8 +257,24 @@ def foget_password():
     
 
 # Serch
-@app.route('/api/serch', methods=['POST'])
+@app.route('/api/serch', methods=['GET', 'POST'])
 def serch():
+
+    data = {
+        "auth": True,
+        "status": False,
+        "msg": "",
+        "output": {
+            "questions": ""
+        }
+    }
+
+    if request.method == 'GET':
+        data["status"] = True
+        data["msg"] = "Successful request"
+        data["output"]["questions"] = "would you like to enjoy with flavorCraft or like to give your requirements?"
+        return jsonify(data), 200
+    
     if request.method == 'POST':
         data = request.get_json()  # Assuming the request contains JSON data
         user_input = data.get('input')
@@ -259,6 +282,10 @@ def serch():
         if user_input == None or user_input == "":
             return "Invalid input !", 404
     
+        # if user_input == "flavorCraft":
+        # Use the model to make predictions based on the user input
+        # model_output = po(user_input)
+        # return jsonify({'input': user_input, 'output': model_output}), 201
         return user_input, 201
 
     else:

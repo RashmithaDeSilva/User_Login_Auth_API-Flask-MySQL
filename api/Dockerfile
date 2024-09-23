@@ -15,16 +15,13 @@ RUN curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py && \
     python get-pip.py && \
     rm get-pip.py
 
-# Install Flask and any other needed packages specified in requirements.txt
-RUN pip install Flask Flask-MySQLdb Flask-Login Flask-Bcrypt Flask-SQLAlchemy
+# Install Flask and other needed packages
+RUN pip install --upgrade pip
+RUN pip install Flask Flask-MySQLdb Flask-Login Flask-Bcrypt
+RUN pip install keras numpy
 
 # Expose port 5000 to the outside world
 EXPOSE 5000
-
-# # Configure the network with the static IP
-# RUN echo "auto eth0" >> /etc/network/interfaces && \
-#     echo "iface eth0 inet static" >> /etc/network/interfaces && \
-#     echo "    address $STATIC_IP" >> /etc/network/interfaces
 
 # Run app.py when the container launches
 CMD ["python", "chat-bot-api.py"]
